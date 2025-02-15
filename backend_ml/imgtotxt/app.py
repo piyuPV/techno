@@ -21,12 +21,13 @@ def extract_text_from_image(image_path):
 def extract_text_from_pdf(pdf_path):
     doc = fitz.open(pdf_path)
     extracted_text = "".join([page.get_text("text") for page in doc])
+    print(extracted_text)
     return extracted_text
 
 # Function to process text using Gemini AI
 def analyze_text_with_gemini(text):
     model = genai.GenerativeModel("gemini-1.5-flash")
-    query = text + " Categorize this extracted text from the invoice into bill number, date, etc. in JSON format and nothing else."
+    query = text + " Categorize this extracted text into  invoiceFile: ,invoiceNumber:,invoiceDate: ,invoiceDueDate:,invoiceAmount:,vendor:,category: ,invoiceType: ,subCategory: ,companyId: ,userId: , in JSON format for  only use these parameter no more no less and if not available return null to it nothing else."
     response = model.generate_content(query)
     return response.text
 
