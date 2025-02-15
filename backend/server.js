@@ -2,9 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth.routes");
-const childRoutes = require("./routes/child.routes");
-const journalRoutes = require("./routes/journal.routes");
 const routes = require("./routes/index.routes");
 dotenv.config();
 
@@ -27,9 +24,7 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use("/users", authRoutes);
-app.use("/children", childRoutes);
-app.use("/journal", journalRoutes);
+app.use("/v1", routes);
 
 app.get("/", (req, res) => {
     res.send("Hello World");
