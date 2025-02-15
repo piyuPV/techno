@@ -13,7 +13,9 @@ const baseUserSchema = z.object({
 });
 
 const individualUserSchema = baseUserSchema.extend({
-    age: z.number().min(18, "Must be at least 18 years old"),
+    age: z.string()
+        .transform((val) => parseInt(val, 10))
+        .refine((val) => val >= 18, "Must be at least 18 years old"),
     gender: z.enum(['male', 'female', 'other', 'prefer-not-to-say'])
 });
 
@@ -22,8 +24,7 @@ const companyUserSchema = baseUserSchema.extend({
         companyName: z.string().min(2, "Company name must be at least 2 characters long"),
         registrationNumber: z.string(),
         industry: z.string(),
-        companySize: z.string(),
-        businessType: z.string()
+        companySize: z.string()
     })
 });
 
@@ -33,6 +34,11 @@ exports.registerUser = async (req, res) => {
         let validatedData;
 
         if (accountType === 'user') {
+            if (!req.body.age || !req.body.gender) {
+                return res.status(400).json({
+                    message: "Age and gender are required for individual users"
+                });
+            }
             validatedData = individualUserSchema.parse(req.body);
         } else if (accountType === 'company') {
             validatedData = companyUserSchema.parse(req.body);
@@ -49,7 +55,13 @@ exports.registerUser = async (req, res) => {
         }
 
         // Create new user
-        const user = new User(validatedData);
+        const user = new User({
+            ...validatedData,
+            ...(accountType === 'user' && {
+                age: parseInt(validatedData.age, 10)
+            })
+        });
+
         await user.save();
 
         // Create token
@@ -67,6 +79,10 @@ exports.registerUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 accountType: user.accountType,
+                ...(user.accountType === 'user' && {
+                    age: user.age,
+                    gender: user.gender
+                }),
                 ...(user.accountType === 'company' && { companyDetails: user.companyDetails })
             }
         });

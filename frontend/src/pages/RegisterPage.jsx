@@ -20,7 +20,14 @@ const RegisterPage = () => {
         registrationNumber: '',
         industry: '',
         companySize: '',
-        businessType: ''
+        businessType: '',
+        // Company fields
+        companyDetails: {
+            companyName: '',
+            registrationNumber: '',
+            industry: '',
+            companySize: ''
+        }
     });
 
     const dispatch = useDispatch();
@@ -29,10 +36,22 @@ const RegisterPage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }));
+
+        if (name.startsWith('companyDetails.')) {
+            const field = name.split('.')[1];
+            setFormData(prev => ({
+                ...prev,
+                companyDetails: {
+                    ...prev.companyDetails,
+                    [field]: value
+                }
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const handleAccountTypeChange = (type) => {
@@ -48,6 +67,7 @@ const RegisterPage = () => {
 
         dispatch(registerStart());
         try {
+            // Prepare registration data based on account type
             const registrationData = {
                 name: formData.name,
                 email: formData.email,
@@ -56,20 +76,20 @@ const RegisterPage = () => {
                 accountType: accountType
             };
 
-            // Add company details if registering as company
-            if (accountType === 'company') {
-                registrationData.companyDetails = {
-                    companyName: formData.companyName,
-                    registrationNumber: formData.registrationNumber,
-                    industry: formData.industry,
-                    companySize: formData.companySize,
-                    businessType: formData.businessType
-                };
+            // Add fields based on account type
+            if (accountType === 'user') {
+                registrationData.age = formData.age;
+                registrationData.gender = formData.gender;
+            } else {
+                registrationData.companyDetails = formData.companyDetails;
             }
 
             const response = await axios.post('/api/users/register', registrationData);
-            dispatch(registerSuccess(response.data));
-            navigate('/login');
+            const { token, user } = response.data;
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            dispatch(registerSuccess(user));
+            navigate('/dashboard');
         } catch (err) {
             dispatch(registerFailure(err.response?.data?.message || 'Registration failed'));
         }
@@ -80,7 +100,7 @@ const RegisterPage = () => {
             {/* Right side - Image */}
             <div className="hidden lg:block lg:w-1/2 relative order-2">
                 <img
-                    src="https://images.unsplash.com/photo-1554224155-6d2f99c7716e?auto=format&fit=crop&q=80"
+                    src=""
                     alt="Financial management and analytics"
                     className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -154,7 +174,7 @@ const RegisterPage = () => {
                                 />
                             </div>
 
-                            {/* Age and Gender fields - Only show for individual users */}
+                            {/* Individual User Fields */}
                             {accountType === 'user' && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -165,8 +185,8 @@ const RegisterPage = () => {
                                             id="age"
                                             name="age"
                                             type="number"
+                                            required
                                             min="18"
-                                            max="120"
                                             value={formData.age}
                                             onChange={handleInputChange}
                                             className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
@@ -180,11 +200,12 @@ const RegisterPage = () => {
                                         <select
                                             id="gender"
                                             name="gender"
+                                            required
                                             value={formData.gender}
                                             onChange={handleInputChange}
                                             className="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150"
                                         >
-                                            <option value="">Select Gender</option>
+                                            <option value="">Select gender</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
                                             <option value="other">Other</option>
