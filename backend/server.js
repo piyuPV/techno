@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const routes = require("./routes/index.routes");
+const authRoutes = require("./routes/auth.routes");
 dotenv.config();
 
 const app = express();
@@ -24,7 +24,7 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use("/v1", routes);
+app.use("/users", authRoutes);
 
 app.get("/", (req, res) => {
     res.send("Hello World");
