@@ -46,11 +46,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                     icon: FaCloudUploadAlt
                 },
                 {
-                    path: '/invoices/create',
-                    name: 'Create Invoice',
-                    icon: FaFileInvoice
-                },
-                {
                     path: '/transactions/new',
                     name: 'New Transaction',
                     icon: FaMoneyBillWave
@@ -61,25 +56,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             title: 'History',
             items: [
                 {
-                    path: '/invoices/history',
-                    name: 'Invoice History',
+                    path: '/history',
+                    name: 'History',
                     icon: FaRegFileAlt
                 },
-                {
-                    path: '/transactions/history',
-                    name: 'Transaction History',
-                    icon: FaHistory
-                },
-                {
-                    path: '/reports/history',
-                    name: 'Report History',
-                    icon: FaClipboardList
-                },
-                {
-                    path: '/anomalies',
-                    name: 'Anomaly Detection',
-                    icon: FaExclamationTriangle
-                }
+
             ]
         },
         {

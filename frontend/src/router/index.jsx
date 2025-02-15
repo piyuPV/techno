@@ -7,6 +7,7 @@ import LandingPage from "../pages/LandingPage";
 import PublicLayout from "../layouts/PublicLayout";
 import PrivateLayout from "../layouts/PrivateLayout";
 import UploadInvoicePage from "../pages/UploadInvoicePage";
+import HistoryPage from "../pages/HistoryPage";
 
 const PrivateRoute = ({ children }) => {
     const { currentUser } = useSelector((state) => state.user);
@@ -34,6 +35,9 @@ const AppRouter = () => {
                     <Route path="/invoices/upload" element={
                         <UploadInvoicePage />
 
+                    } />
+                    <Route path="/history" element={
+                        <HistoryPage />
                     } />
                 </Route>
             </Routes>
