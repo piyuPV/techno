@@ -4,7 +4,7 @@ import os
 import pickle
 import urllib.parse
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
-
+import fitz  # PyMuPDF
 import easyocr
 import numpy as np
 
@@ -22,6 +22,20 @@ def text(image):
 
 query = text('1.png') + "analyse this extracted text from the invoice and categorise them in bill no., date, etc in json and nothing else"
 
+
+def for_pdf(pdf_path):
+    
+    doc = fitz.open(pdf_path)
+    text = ""
+    
+    for page in doc:
+        text += page.get_text("text")  # Extract text from each page
+        
+    return text
+
+pdf_file = "pdf.pdf"  
+extracted_text = for_pdf(pdf_file)
+print(extracted_text)
 
     
 import google.generativeai as genai
